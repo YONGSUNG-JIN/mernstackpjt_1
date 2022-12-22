@@ -13,16 +13,37 @@ const db = mysql.createConnection({
     database: process.env.DB_DATABASE
 });
 
-app.get("/", (req,res)=> {
+
+app.use(express.json())
+
+
+app.get("/", (req, res) => {
     res.json("Hello this is the server")
 })
 
 app.get("/books", (req, res) => {
     const q = "SELECT * FROM books";
-    db.query(q, (err, data)=> {
-        if(err) return res.json(err);
+    db.query(q, (err, data) => {
+        if (err) return res.json(err);
         return res.json(data);
     })
 })
 
-app.listen(PORT, ()=> console.log(`Connected to the server... running on Port : ${PORT}`))
+app.post("/books", (req, res) => {
+    console.log(req.body)
+
+    const q = "INSERT INTO books (`title`, `desc`, `cover`) VALUE (?)"
+    const values = [
+        req.body.title,
+        req.body.desc,
+        req.body.cover,
+        ];
+    db.query(q, [values], (err, data) => {
+        if (err) return res.json(err);
+        return res.json("Book content created!");
+    })
+})
+
+
+
+app.listen(PORT, () => console.log(`Connected to the server... running on Port : ${PORT}`))
